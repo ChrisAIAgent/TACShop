@@ -10,7 +10,7 @@ const { Pool } = require("pg");
 const app = express();
 const PORT = parseInt(process.env.PORT || "18890", 10);
 const FRONTEND_DIR = process.env.FRONTEND_DIR || path.join(__dirname, 'frontend');
-const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || 'sk-8f3a3e4af5ff46c587d218ec2f7de847';
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const DEEPSEEK_API_URL = process.env.DEEPSEEK_API_URL || 'https://api.deepseek.com/v1/chat/completions';
 
 app.use(cors());
@@ -338,8 +338,10 @@ app.get("/api/student/assignments", async (req, res) => {
 
 
 app.post("/api/ai/test-connection", async (req, res) => {
+  if (!DEEPSEEK_API_KEY) {
+    return res.json({ code: 1002, message: "DEEPSEEK_API_KEY not set" });
+  }
   try {
-    const api_key = DEEPSEEK_API_KEY;
     const fetch = (await import("node-fetch")).default;
     const response = await fetch(DEEPSEEK_API_URL, {
       method: "POST",
